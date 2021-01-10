@@ -1,0 +1,8 @@
+---
+- name: Configure kalkspace getränke mete
+  hosts:
+    - tablet
+  roles:
+    - mete-user
+    - kiosk
+    - mete

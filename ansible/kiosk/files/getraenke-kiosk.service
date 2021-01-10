@@ -1,0 +1,21 @@
+[Unit]
+Description=KalkSpace Getränke Kiosk
+OnFailure=getty@tty1.service
+Conflicts=getty@tty1.service
+After=graphical.target
+
+[Service]
+User=mete
+Restart=always
+RestartSec=2
+Environment="MOZ_ENABLE_WAYLAND=1"
+ExecStart=/usr/bin/phoc -C /etc/kalkspace/phoc.ini -E /etc/kalkspace/kiosk.sh
+WorkingDirectory=~
+TTYPath=/dev/tty1
+PAMName=login
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+
+[Install]
+WantedBy=graphical.target

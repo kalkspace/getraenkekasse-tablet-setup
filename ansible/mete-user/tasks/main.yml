@@ -1,0 +1,8 @@
+---
+- block:
+    - name: add mete user
+      user:
+        name: mete
+
+  become: true
+  become_user: root

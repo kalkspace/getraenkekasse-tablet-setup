@@ -1,0 +1,52 @@
+---
+- block:
+    - name: apt update && upgrade
+      apt:
+        cache_valid_time: 3600
+        upgrade: safe
+    - name: install tablet kiosk required packages
+      apt:
+        pkg:
+          - firefox-esr
+          - squeekboard
+          - phoc
+          - foot
+    - name: copy getränkekiosk
+      copy:
+        src: files/getraenke-kiosk.service
+        dest: /etc/systemd/system/getraenke-kiosk.service
+        owner: mete-mgmt
+        group: mete-mgmt
+        mode: 0755
+      notify:
+        - restart getränkekiosk
+    - name: create kalkspace settings dir
+      file:
+        path: /etc/kalkspace
+        state: directory
+        owner: mete-mgmt
+        group: mete-mgmt
+    - name: copy phoc.ini
+      copy:
+        src: files/phoc.ini
+        dest: /etc/kalkspace/phoc.ini
+      notify:
+        - restart getränkekiosk
+    - name: copy kiosk.sh
+      copy:
+        src: files/kiosk.sh
+        dest: /etc/kalkspace/kiosk.sh
+        owner: mete-mgmt
+        group: mete-mgmt
+        mode: 0755
+      notify:
+        - restart getränkekiosk
+    - name: enable getränkekiosk
+      systemd:
+        name: getraenke-kiosk
+        enabled: yes
+        daemon_reload: yes
+        state: started
+
+  become: true
+  become_user: root

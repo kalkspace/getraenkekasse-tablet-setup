@@ -1,0 +1,18 @@
+#!/bin/sh
+
+squeekboard &
+# this is super annoying. something (my current guess is phoc) prevents squeekboard
+# from popping up at all after a fresh start of firefox
+# when "something" (unknown what exactly) is happening on the desktop
+# squeekboard and firefox work together as expected
+# 
+# Known "somethings":
+# - Press alt-f4 in firefox and cancel closing
+# - Press alt-tab in phoc when 2 apps are running at the same time
+# - this little hack below which just starts foot (a simple wayland term)
+#   after firefox (IMPORTANT - hope 10s is enough)
+#   and lets it exit after 1s (so the window pops up and closes again)
+#   this here was the only thing I found that is automatable
+#   please absolutely change it if you find a better solution
+(sleep 10 && foot sh -c "echo 'KalkSpace Kiosk' && sleep 1") &
+firefox --kiosk http://localhost

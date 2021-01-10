@@ -1,0 +1,7 @@
+---
+- block:
+    - name: restart getränkekiosk
+      systemd:
+        name: getraenke-kiosk
+        state: restarted
+  become: true
