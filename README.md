@@ -12,6 +12,12 @@ It only has 1GB of RAM making it challenging to run a browser + mete on it.
 
 The device has a 64Bit processor but only has a 32bit EFI system. This requires a special installation medium
 
+3. Linux desktop
+
+- on screen keyboard required
+- gnome is looking quite good (has OSK etc.) but needs stronger hardware and more mem
+- camera support? => might need custom kernel https://www.kernelconfig.io/config_intel_atomisp
+
 ## Preparation
 
 Generate a USB stick following the instructions in the debian-iso subdir
@@ -49,3 +55,5 @@ systemctl start ssh
 https://wiki.debian.org/WiFi/HowToUse#wpa_supplicant
 
 ## Install kiosk
+
+`ansible-playbook tablet.yml -v -i inventory.ini --ask-pass -K`
