@@ -1,6 +1,14 @@
 #!/bin/sh
 
 squeekboard &
+
+FAIL="1"
+while [ "$FAIL" -ne "0" ]; do
+    sleep 1
+    curl http://localhost -s -f -o /dev/null
+    FAIL=$?
+done
+
 # this is super annoying. something (my current guess is phoc) prevents squeekboard
 # from popping up at all after a fresh start of firefox
 # when "something" (unknown what exactly) is happening on the desktop

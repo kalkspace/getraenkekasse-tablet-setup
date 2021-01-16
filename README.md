@@ -6,7 +6,7 @@ This thing is quite difficult to setup/operate (but also many many bonus points 
 
 1. Low memory
 
-It only has 1GB of RAM making it challenging to run a browser + mete on it.
+It only has ~~1GB~~ THE NEW HAS 2GB of RAM making it challenging to run a browser + mete on it.
 
 2. 32Bit EFI
 
@@ -24,36 +24,27 @@ Generate a USB stick following the instructions in the debian-iso subdir
 
 ## Debian installation
 
-**_INCOMPLETE_**
+Start the tablet and hold volume down to enter the BIOS.
+Verify "Secure Boot/Secure Boot Enable" is off
+Verify "System Configuration/USB Configuration/(Enable Boot Support and External Usb)" is on
 
-Please ignore wifi errors during install and just "continue without configuring a network at this time".
-Unknown what is going on in the installer.
+Go to "General/Boot Sequence" and add a "stick" "Boot option" using the EFI Image from the stick.
+
+Do a standard install (use entire disk etc.).
 
 During installation create the user `mete-mgmt`.
 
-grub-ia32 for some reason doesn't properly install :|
-Reboot to stick after installation
+The installer fails to properly install the grub bootloader into EFI unfortunately.
 
-Press C to enter GRUB command line
+Restart into BIOS once more.
 
-```
-linux (hd1,gpt2)/vmlinuz root=/dev/mmcblk1p2
-initrd (hd1,gpt2)/initrd.img
-boot
-```
+Go to "General/Boot Sequence".
 
-```
-mount /dev/sda1 /media/cdrom
-apt-get install wpasupplicant sudo openssh-server
-grub-install --bootloader-id=debian
-systemctl enable ssh
-systemctl start ssh
-# add mete-mgmt to sudo group
-# update sources.list to official http sources
-```
-
-https://wiki.debian.org/WiFi/HowToUse#wpa_supplicant
+Select "Add boot option" and select "\EFI\debian\grubia32.efi" from the MMC filesystem.
 
 ## Install kiosk
+
+For ansible to work you first need to manually install `sudo` and add `mete-mgmt`
+to the `sudo` group in /etc/group.
 
 `ansible-playbook tablet.yml -v -i inventory.ini --ask-pass -K`

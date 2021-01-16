@@ -4,6 +4,12 @@
       apt:
         cache_valid_time: 3600
         upgrade: safe
+    - name: create kalkspace settings dir
+      file:
+        path: /etc/kalkspace
+        state: directory
+        owner: mete-mgmt
+        group: mete-mgmt
     - name: install docker
       apt:
         pkg:

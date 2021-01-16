@@ -3,6 +3,6 @@
   hosts:
     - tablet
   roles:
-    - mete-user
+    - user
     - kiosk
     - mete

@@ -1,0 +1,31 @@
+---
+- block:
+    - name: add mete user
+      user:
+        name: mete
+        password: "*"
+
+  become: true
+  become_user: root
+
+- name: set authorized keys for kalkspace admin team
+  ansible.posix.authorized_key:
+    user: mete-mgmt
+    state: present
+    key: "https://github.com/{{ item }}.keys"
+    comment: "{{ item }}@github"
+
+  loop:
+    - buecherwurmmm
+    - haralk
+    - m0ppers
+    - mraerino
+
+- name: allow nopasswd sudo
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: "^%sudo"
+    line: "%sudo ALL=(ALL) NOPASSWD: ALL"
+    validate: "visudo -cf %s"
+  become: true

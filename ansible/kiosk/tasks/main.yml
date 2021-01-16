@@ -11,6 +11,7 @@
           - squeekboard
           - phoc
           - foot
+          - curl
     - name: copy getränkekiosk
       copy:
         src: files/getraenke-kiosk.service

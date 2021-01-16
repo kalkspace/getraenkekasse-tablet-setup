@@ -1,0 +1,7 @@
+---
+- block:
+    - name: restart mete-firewall
+      systemd:
+        name: mete-firewall
+        state: restarted
+  become: true
