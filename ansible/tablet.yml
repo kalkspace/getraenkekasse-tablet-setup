@@ -1,9 +1,9 @@
 ---
-- name: Configure kalkspace getränke mete
+- name: Configure kalkspace getränkekassen tablet
   hosts:
     - tablet
   roles:
     - firmware
     - user
     - kiosk
-    - mete
+    - getraenkekasse

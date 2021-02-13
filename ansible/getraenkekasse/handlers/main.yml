@@ -1,0 +1,8 @@
+---
+- name: restart traefik
+  community.general.docker_compose:
+    project_src: /etc/kalkspace/getraenkekasse/
+    pull: yes
+    restarted: yes
+    services:
+      - traefik

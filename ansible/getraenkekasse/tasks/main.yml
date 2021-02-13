@@ -1,0 +1,88 @@
+---
+- block:
+    - name: apt update && upgrade
+      apt:
+        cache_valid_time: 3600
+        upgrade: safe
+    - name: create kalkspace settings dir
+      file:
+        path: /etc/kalkspace
+        state: directory
+        owner: getraenkekasse-mgmt
+        group: getraenkekasse-mgmt
+    - name: install required packages
+      apt:
+        pkg:
+          - docker.io
+          - docker-compose
+          - python3-docker
+          - pcscd
+          - libacsccid1
+          - prometheus-node-exporter
+    - name: blacklist kernel nfc module so pcscd works
+      copy:
+        src: files/nfc-blacklist.conf
+        dest: /etc/modprobe.d/nfc-blacklist.conf
+        owner: root
+        group: root
+    - name: ensure getraenkekasse-mgmt can run docker
+      user:
+        name: getraenkekasse-mgmt
+        groups: docker
+        append: yes
+    - name: enable docker
+      systemd:
+        name: docker
+        enabled: yes
+        masked: no
+        state: started
+    - name: enable pcscd
+      systemd:
+        name: pcscd
+        enabled: yes
+        masked: no
+        state: started
+    - name: getraenkekasse directory
+      file:
+        path: /etc/kalkspace/getraenkekasse
+        state: directory
+        owner: getraenkekasse-mgmt
+        group: getraenkekasse-mgmt
+    - name: copy docker-compose definition
+      copy:
+        src: files/docker-compose.yml
+        dest: /etc/kalkspace/getraenkekasse/docker-compose.yml
+        owner: getraenkekasse-mgmt
+        group: getraenkekasse-mgmt
+    - debug:
+        var: ansible_default_ipv6
+    - name: create traefik.toml
+      ansible.builtin.template:
+        src: templates/traefik.toml.j2
+        dest: /etc/kalkspace/getraenkekasse/traefik.toml
+        owner: getraenkekasse-mgmt
+        group: getraenkekasse-mgmt
+        mode: 0755
+      notify:
+        - restart traefik
+    - name: create fileprovider.toml
+      ansible.builtin.template:
+        src: templates/fileprovider.toml.j2
+        dest: /etc/kalkspace/getraenkekasse/fileprovider.toml
+        owner: getraenkekasse-mgmt
+        group: getraenkekasse-mgmt
+        mode: 0755
+      notify:
+        - restart traefik
+    - name: start getraenkekasse setup
+      community.general.docker_compose:
+        project_src: /etc/kalkspace/getraenkekasse/
+        pull: yes
+      # for development purposes there is "localhost"
+      # if we deploy live traefik needs additional host rule so the traefik letsencrypt host magic works
+      # ugly but works :S
+      environment:
+        TRAEFIK_HOST_RULE: "{{ (public_hostname != 'localhost') | ternary('Host(`' + public_hostname + '`) && ', '') }}"
+
+  become: true
+  become_user: root

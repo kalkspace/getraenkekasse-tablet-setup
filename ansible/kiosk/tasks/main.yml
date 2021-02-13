@@ -16,8 +16,8 @@
       copy:
         src: files/getraenke-kiosk.service
         dest: /etc/systemd/system/getraenke-kiosk.service
-        owner: mete-mgmt
-        group: mete-mgmt
+        owner: getraenkekasse-mgmt
+        group: getraenkekasse-mgmt
         mode: 0755
       notify:
         - restart getränkekiosk
@@ -25,8 +25,8 @@
       file:
         path: /etc/kalkspace
         state: directory
-        owner: mete-mgmt
-        group: mete-mgmt
+        owner: getraenkekasse-mgmt
+        group: getraenkekasse-mgmt
     - name: copy phoc.ini
       copy:
         src: files/phoc.ini
@@ -37,8 +37,8 @@
       copy:
         src: files/kiosk.sh
         dest: /etc/kalkspace/kiosk.sh
-        owner: mete-mgmt
-        group: mete-mgmt
+        owner: getraenkekasse-mgmt
+        group: getraenkekasse-mgmt
         mode: 0755
       notify:
         - restart getränkekiosk

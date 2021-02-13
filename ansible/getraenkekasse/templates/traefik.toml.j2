@@ -1,0 +1,41 @@
+[log]
+#level = "DEBUG"
+
+[api]
+dashboard = true
+insecure = true
+
+[providers]
+    [providers.docker]
+        exposedByDefault = false
+        endpoint = "unix:///var/run/docker.sock"
+        network = "getraenkekasse_ingress"
+    [providers.file]
+        filename = "/etc/traefik/fileprovider.toml"
+
+[entryPoints]
+    [entryPoints.web]
+        address = ":80"
+    [entryPoints.web.http]
+        middlewares = ["only-internal@file"]
+        {# keep http active if we are deploying locally (testdeploy) #}
+{% if public_hostname != "localhost" %}
+        [entryPoints.web.http.redirections]
+            [entryPoints.web.http.redirections.entrypoint]
+            to = "websecure"
+            scheme = "https"
+{% endif %}
+
+    [entryPoints.websecure]
+        address = ":443"
+    [entryPoints.websecure.http]
+        middlewares = ["only-internal@file"]
+
+[certificatesResolvers.letsencrypt.acme]
+    email = "hallo+letsencrypt@kalk.space"
+    storage = "/var/traefik_certs/acme.json"
+    [certificatesResolvers.letsencrypt.acme.httpChallenge]
+        entryPoint = "web"
+
+[serversTransport]
+  insecureSkipVerify = true

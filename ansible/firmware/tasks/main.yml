@@ -4,7 +4,7 @@
       apt_repository:
         repo: "deb http://mirror.netcologne.de/debian/ bullseye non-free"
         state: present
-        filename: bullseye non-free
+        filename: bullseye-non-free.list
         update_cache: yes
     - name: apt update && upgrade
       apt:

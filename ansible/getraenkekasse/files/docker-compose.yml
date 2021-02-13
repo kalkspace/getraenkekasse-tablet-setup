@@ -1,0 +1,104 @@
+version: "3"
+volumes:
+  system:
+  mete-database:
+  getraenkekasse-mete-compat-database:
+  traefik-certs:
+
+networks:
+  database:
+  ingress:
+
+services:
+  traefik:
+    image: traefik:v2.4
+    restart: unless-stopped
+    # use host networking to bind to ipv6 as well in a cheap way :S
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/kalkspace/getraenkekasse/traefik.toml:/etc/traefik/traefik.toml
+      - /etc/kalkspace/getraenkekasse/fileprovider.toml:/etc/traefik/fileprovider.toml
+      - traefik-certs:/var/traefik_certs
+  mete:
+    networks:
+      - ingress
+      - database
+    environment:
+      RAILS_ENV: production
+      RAILS_RELATIVE_URL_ROOT: /mete
+    image: m0ppers/mete
+    volumes:
+      - system:/app/public/system
+    restart: unless-stopped
+    depends_on:
+      - db
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.mete-https.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/mete`)
+      traefik.http.routers.mete-https.entrypoints: websecure
+      traefik.http.routers.mete-https.tls.certresolver: letsencrypt
+      traefik.http.routers.mete-http.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/mete`)
+      traefik.http.routers.mete-http.entrypoints: web
+  # mete expects name = db
+  db:
+    networks:
+      - database
+    image: postgres:10-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: mete
+    volumes:
+      - mete-database:/var/lib/postgresql/data
+  getraenkekassengeraete:
+    networks:
+      - ingress
+    environment:
+      RUST_LOG: debug
+    image: quay.io/kalkspace/getraenkekassengeraete:main
+    restart: unless-stopped
+    devices:
+      - /dev/input/by-id/usb-Newtologic_NT4010S_XXXXXX-event-kbd:/dev/input/by-id/usb-Newtologic_NT4010S_XXXXXX-event-kbd
+    volumes:
+      - /var/run/pcscd/pcscd.comm:/var/run/pcscd/pcscd.comm
+    labels:
+      traefik.enable: "true"
+      traefik.http.middlewares.getraenkekassengeraete-strip.stripprefix.prefixes: /events
+      traefik.http.routers.getraenkekassengeraete-https.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/events`)
+      traefik.http.routers.getraenkekassengeraete-https.middlewares: getraenkekassengeraete-strip@docker
+      traefik.http.routers.getraenkekassengeraete-https.entrypoints: websecure
+      traefik.http.routers.getraenkekassengeraete-https.tls.certresolver: letsencrypt
+      traefik.http.routers.getraenkekassengeraete-http.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/events`)
+      traefik.http.routers.getraenkekassengeraete-http.middlewares: getraenkekassengeraete-strip@docker
+      traefik.http.routers.getraenkekassengeraete-http.entrypoints: web
+  getraenkekasse-mete-compat:
+    networks:
+      - ingress
+    image: quay.io/kalkspace/getraenkekasse-mete-compat:main
+    restart: unless-stopped
+    environment:
+      DATABASE_FILE: /var/lib/getraenkekasse-mete-compat/database.sqlite
+    volumes:
+      - getraenkekasse-mete-compat-database:/var/lib/getraenkekasse-mete-compat
+    labels:
+      traefik.enable: "true"
+      traefik.http.middlewares.mete-strip.stripprefix.prefixes: /mete-compat
+      traefik.http.routers.getraenkekasse-mete-compat-https.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/mete-compat`)
+      traefik.http.routers.getraenkekasse-mete-compat-https.middlewares: mete-strip@docker
+      traefik.http.routers.getraenkekasse-mete-compat-https.entrypoints: websecure
+      traefik.http.routers.getraenkekasse-mete-compat-https.tls.certresolver: letsencrypt
+      traefik.http.routers.getraenkekasse-mete-compat-http.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/mete-compat`)
+      traefik.http.routers.getraenkekasse-mete-compat-http.middlewares: mete-strip@docker
+      traefik.http.routers.getraenkekasse-mete-compat-http.entrypoints: web
+  getraenkekasse:
+    networks:
+      - ingress
+    image: quay.io/kalkspace/getraenkekasse:main
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.getraenkekasse-https.entrypoints: websecure
+      traefik.http.routers.getraenkekasse-https.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/`)
+      traefik.http.routers.getraenkekasse-https.tls.certresolver: letsencrypt
+      traefik.http.routers.getraenkekasse-http.entrypoints: web
+      traefik.http.routers.getraenkekasse-http.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/`)
