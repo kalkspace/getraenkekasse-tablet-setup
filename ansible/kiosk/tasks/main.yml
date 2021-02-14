@@ -34,8 +34,8 @@
       notify:
         - restart getränkekiosk
     - name: copy kiosk.sh
-      copy:
-        src: files/kiosk.sh
+      template:
+        src: templates/kiosk.sh.j2
         dest: /etc/kalkspace/kiosk.sh
         owner: getraenkekasse-mgmt
         group: getraenkekasse-mgmt
