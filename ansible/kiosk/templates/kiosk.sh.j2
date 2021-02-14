@@ -5,7 +5,7 @@ squeekboard &
 FAIL="1"
 while [ "$FAIL" -ne "0" ]; do
     sleep 1
-    curl http://localhost -s -f -o /dev/null
+    curl http://{{ public_hostname }} -s -f -o /dev/null
     FAIL=$?
 done
 
@@ -23,4 +23,4 @@ done
 #   this here was the only thing I found that is automatable
 #   please absolutely change it if you find a better solution
 (sleep 10 && foot sh -c "echo 'KalkSpace Kiosk' && sleep 1") &
-firefox --kiosk http://localhost
+firefox --kiosk http://{{ public_hostname }}
