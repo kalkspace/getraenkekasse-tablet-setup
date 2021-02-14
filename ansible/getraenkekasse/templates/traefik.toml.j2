@@ -17,7 +17,8 @@ insecure = true
     [entryPoints.web]
         address = ":80"
     [entryPoints.web.http]
-        middlewares = ["only-internal@file"]
+# acme must still be allowed so disable for http...everything is redirected to https anyway (or we have a local test installation)
+#        middlewares = ["only-internal@file"]
         {# keep http active if we are deploying locally (testdeploy) #}
 {% if public_hostname != "localhost" %}
         [entryPoints.web.http.redirections]
