@@ -5,7 +5,14 @@ squeekboard &
 FAIL="1"
 while [ "$FAIL" -ne "0" ]; do
     sleep 1
-    curl http://{{ public_hostname }} -s -f -o /dev/null
+    curl http://{{ public_hostname }} -s -f -L -o /dev/null
+    FAIL=$?
+done
+# wait for mete as well so the initial screen shows drinks right away
+FAIL="1"
+while [ "$FAIL" -ne "0" ]; do
+    sleep 1
+    curl http://{{ public_hostname }}/mete/api/v1/drinks.json -s -f -L -o /dev/null
     FAIL=$?
 done
 
