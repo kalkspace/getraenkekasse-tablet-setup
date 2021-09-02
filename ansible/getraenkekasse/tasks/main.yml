@@ -82,6 +82,7 @@
       community.general.docker_compose:
         project_src: /etc/kalkspace/getraenkekasse/
         pull: yes
+        recreate: smart
       # for development purposes there is "localhost"
       # if we deploy live traefik needs additional host rule so the traefik letsencrypt host magic works
       # ugly but works :S
