@@ -25,6 +25,10 @@
         dest: /etc/modprobe.d/nfc-blacklist.conf
         owner: root
         group: root
+    - name: copy stornoschluessel udev rules
+      copy:
+        src: files/52-storno.rules
+        dest: /etc/udev/rules.d/52-storno.rules
     - name: ensure getraenkekasse-mgmt can run docker
       user:
         name: getraenkekasse-mgmt

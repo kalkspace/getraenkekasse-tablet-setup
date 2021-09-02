@@ -57,9 +57,14 @@ services:
       RUST_LOG: debug
     image: quay.io/kalkspace/getraenkekassengeraete:main
     restart: unless-stopped
-    devices:
-      - /dev/input/by-id/usb-Newtologic_NT4010S_XXXXXX-event-kbd:/dev/input/by-id/usb-Newtologic_NT4010S_XXXXXX-event-kbd
+    # the geraete container allows hotplugging of all the devices. unfortunately this is not compatible
+    # with the way that docker handles devices
+    # for --device the device has to be present (i.e. it wouldn't be possible to start it without nfc AND storno connected)
+    # privileged hands over all devices in /dev but ONLY a snapshot of what was there at the time
+    # the only solution I found was to use privileged (so we can actually open() the devices) and mounting the host /dev fs
+    privileged: true
     volumes:
+      - /dev:/dev
       - /var/run/pcscd/pcscd.comm:/var/run/pcscd/pcscd.comm
     labels:
       traefik.enable: "true"
