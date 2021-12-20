@@ -8,7 +8,6 @@
       apt:
         pkg:
           - firefox-esr
-          - squeekboard
           - phoc
           - foot
           - curl
@@ -48,6 +47,11 @@
         enabled: yes
         daemon_reload: yes
         state: started
+    - name: reduce stop timeout because containerd-shim hangs
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/system.conf
+        regexp: "^DefaultTimeoutStopSec="
+        line: DefaultTimeoutStopSec=5s
 
   become: true
   become_user: root
