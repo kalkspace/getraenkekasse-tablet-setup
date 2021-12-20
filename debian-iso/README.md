@@ -1,10 +1,13 @@
 # Description
 
 this creates a bootable amd64 debian bullseye usb stick that boots from an ia32 EFI.
-Please note that the kalkspace tablet needs some special non-free firmware.
-Use an appropriate image
 
-(e.g. https://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/bullseye_di_alpha3+nonfree/amd64/iso-cd/)
+If you need special firmware make sure to download an appropriate image
+
+(e.g. something like https://cdimage.debian.org/cdimage/unofficial/non-free/cd-including-firmware/bullseye_di_alpha3+nonfree/amd64/iso-cd/)
+
+The kalkspace tablet does NOT need special firmware to work as intended (wifi etc. will not work but they are not in use)
+so the standard installation medium is enough.
 
 ## Prerequisites
 

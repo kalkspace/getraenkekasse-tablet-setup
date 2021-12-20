@@ -78,7 +78,7 @@ cleanup()
     sync ${USBDEV}2
     umount /tmp/debian-bullseye-kalkspace-iso/iso-{data,efi}
     losetup -D
-    umount /tmp/debian-bullseye-kalkspace-iso/stick-{data,efi}
+    umount /tmp/debian-bullseye-kalkspace-iso/stick-efi
     rm -r /tmp/debian-bullseye-kalkspace-iso
 }
 
@@ -98,11 +98,12 @@ mkdir -p /tmp/debian-bullseye-kalkspace-iso/stick-{data,efi}
 LOOP=$(losetup --find --show --partscan --read-only $ISO)
 mount ${LOOP}p1 /tmp/debian-bullseye-kalkspace-iso/iso-data
 cp -a /tmp/debian-bullseye-kalkspace-iso/iso-data /tmp/debian-bullseye-kalkspace-iso/iso-data-modified
-mount ${USBDEV}1 /tmp/debian-bullseye-kalkspace-iso/stick-data
+
+(cd /tmp/debian-bullseye-kalkspace-iso && wget http://ftp.us.debian.org/debian/dists/bullseye/main/binary-amd64/Packages.gz)
 
 # add grub-ia32 to installation medium
-GRUB=$(zcat /home/mop/Downloads/Packages.gz | rg -U "Package: grub-efi-ia32\n(^[^\n]+\n)*" | rg "^Filename" | sed -e 's/Filename: //g')
-GRUB_BIN=$(zcat /home/mop/Downloads/Packages.gz | rg -U "Package: grub-efi-ia32-bin\n(^[^\n]+\n)*" | rg "^Filename" | sed -e 's/Filename: //g')
+GRUB=$(zcat /tmp/debian-bullseye-kalkspace-iso/Packages.gz | rg -U "Package: grub-efi-ia32\n(^[^\n]+\n)*" | rg "^Filename" | sed -e 's/Filename: //g')
+GRUB_BIN=$(zcat /tmp/debian-bullseye-kalkspace-iso/Packages.gz | rg -U "Package: grub-efi-ia32-bin\n(^[^\n]+\n)*" | rg "^Filename" | sed -e 's/Filename: //g')
 mkdir -p /tmp/debian-bullseye-kalkspace-iso/iso-data-modified/$(dirname $GRUB)
 mkdir -p /tmp/debian-bullseye-kalkspace-iso/iso-data-modified/$(dirname $GRUB_BIN)
 (cd /tmp/debian-bullseye-kalkspace-iso/iso-data-modified/$(dirname $GRUB) && wget http://ftp.us.debian.org/debian/$GRUB)
