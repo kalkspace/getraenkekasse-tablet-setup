@@ -1,3 +1,16 @@
 [http.middlewares]
     [http.middlewares.only-internal.ipWhiteList]
         sourceRange = ["127.0.0.1/32", "::1", "{{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.netmask) | ipaddr('network/prefix') }}", "{{ ansible_default_ipv6.address }}/{{ ansible_default_ipv6.prefix }}"]
+
+[http.routers]
+  [http.routers.node-exporter]
+    rule = "Host(`{{ public_hostname }}`) && Path(`/metrics`)"
+    service = "node-exporter"
+    entryPoints = ["websecure"]
+    [http.routers.node-exporter.tls]
+      certResolver = "letsencrypt"
+
+[http.services]
+  [http.services.node-exporter.loadBalancer]
+    [[http.services.node-exporter.loadBalancer.servers]]
+      url = "http://localhost:9100/"

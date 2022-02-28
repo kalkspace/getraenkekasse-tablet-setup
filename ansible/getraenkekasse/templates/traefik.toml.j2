@@ -29,8 +29,8 @@ insecure = true
 
     [entryPoints.websecure]
         address = ":443"
-    [entryPoints.websecure.http]
-        middlewares = ["only-internal@file"]
+    # [entryPoints.websecure.http]
+        # middlewares = ["only-internal@file"]
 
 [certificatesResolvers.letsencrypt.acme]
     email = "hallo+letsencrypt@kalk.space"

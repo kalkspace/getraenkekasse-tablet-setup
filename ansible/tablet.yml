@@ -3,7 +3,6 @@
   hosts:
     - tablet
   roles:
-    - firmware
     - user
     - kiosk
     - getraenkekasse

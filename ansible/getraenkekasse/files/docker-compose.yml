@@ -38,8 +38,10 @@ services:
       traefik.http.routers.mete-https.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/mete`)
       traefik.http.routers.mete-https.entrypoints: websecure
       traefik.http.routers.mete-https.tls.certresolver: letsencrypt
+      traefik.http.routers.mete-https.middlewares: only-internal@file
       traefik.http.routers.mete-http.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/mete`)
       traefik.http.routers.mete-http.entrypoints: web
+        
   # mete expects name = db
   db:
     networks:
@@ -70,7 +72,7 @@ services:
       traefik.enable: "true"
       traefik.http.middlewares.getraenkekassengeraete-strip.stripprefix.prefixes: /events
       traefik.http.routers.getraenkekassengeraete-https.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/events`)
-      traefik.http.routers.getraenkekassengeraete-https.middlewares: getraenkekassengeraete-strip@docker
+      traefik.http.routers.getraenkekassengeraete-https.middlewares: getraenkekassengeraete-strip@docker,only-internal@file
       traefik.http.routers.getraenkekassengeraete-https.entrypoints: websecure
       traefik.http.routers.getraenkekassengeraete-https.tls.certresolver: letsencrypt
       traefik.http.routers.getraenkekassengeraete-http.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/events`)
@@ -89,7 +91,7 @@ services:
       traefik.enable: "true"
       traefik.http.middlewares.mete-strip.stripprefix.prefixes: /mete-compat
       traefik.http.routers.getraenkekasse-mete-compat-https.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/mete-compat`)
-      traefik.http.routers.getraenkekasse-mete-compat-https.middlewares: mete-strip@docker
+      traefik.http.routers.getraenkekasse-mete-compat-https.middlewares: mete-strip@docker,only-internal@file
       traefik.http.routers.getraenkekasse-mete-compat-https.entrypoints: websecure
       traefik.http.routers.getraenkekasse-mete-compat-https.tls.certresolver: letsencrypt
       traefik.http.routers.getraenkekasse-mete-compat-http.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/mete-compat`)
@@ -105,5 +107,6 @@ services:
       traefik.http.routers.getraenkekasse-https.entrypoints: websecure
       traefik.http.routers.getraenkekasse-https.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/`)
       traefik.http.routers.getraenkekasse-https.tls.certresolver: letsencrypt
+      traefik.http.routers.getraenkekasse-https.middlewares: mete-strip@docker,only-internal@file
       traefik.http.routers.getraenkekasse-http.entrypoints: web
       traefik.http.routers.getraenkekasse-http.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/`)
