@@ -25,6 +25,12 @@
         dest: /etc/modprobe.d/nfc-blacklist.conf
         owner: root
         group: root
+    - name: blacklist kernel sound module (needs firmware, spams log)
+      copy:
+        src: files/sound-blacklist.conf
+        dest: /etc/modprobe.d/sound-blacklist.conf
+        owner: root
+        group: root
     - name: copy stornoschluessel udev rules
       copy:
         src: files/52-storno.rules

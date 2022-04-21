@@ -7,10 +7,14 @@
     - name: install tablet kiosk required packages
       apt:
         pkg:
-          - firefox-esr
+          - chromium
           - phoc
           - foot
           - curl
+    - name: remove pulseaudio
+      apt:
+        name: pulseaudio
+        state: absent
     - name: copy getränkekiosk
       copy:
         src: files/getraenke-kiosk.service
