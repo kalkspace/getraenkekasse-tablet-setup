@@ -52,6 +52,12 @@
         enabled: yes
         masked: no
         state: started
+    - name: disable modemmanager
+      systemd:
+        name: ModemManager
+        enabled: no
+        masked: no
+        state: stopped
     - name: getraenkekasse directory
       file:
         path: /etc/kalkspace/getraenkekasse
