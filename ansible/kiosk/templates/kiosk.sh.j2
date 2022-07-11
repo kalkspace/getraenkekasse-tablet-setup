@@ -1,5 +1,7 @@
 #!/bin/sh
 
+DISPLAY=:0 xset -dpms
+
 FAIL="1"
 while [ "$FAIL" -ne "0" ]; do
     sleep 1
@@ -15,8 +17,6 @@ while [ "$FAIL" -ne "0" ]; do
 done
 
 chromium \
-    --enable-features=UseOzonePlatform \
-    --ozone-platform=wayland \
     --disable-pinch --start-fullscreen \
     --overscroll-history-navigation=0 \
     --kiosk http://getraenkekasse.kalk.space

@@ -8,20 +8,29 @@
       apt:
         pkg:
           - chromium
-          - phoc
-          - foot
           - curl
+          - lightdm
+          - xorg
     - name: remove pulseaudio
       apt:
         name: pulseaudio
         state: absent
     - name: copy getränkekiosk
       copy:
-        src: files/getraenke-kiosk.service
-        dest: /etc/systemd/system/getraenke-kiosk.service
-        owner: getraenkekasse-mgmt
-        group: getraenkekasse-mgmt
+        src: .xinitrc
+        dest: /home/getraenkekasse/.xinitrc
+        owner: getraenkekasse
+        group: getraenkekasse
         mode: 0755
+      notify:
+        - restart getränkekiosk
+    - name: link the FUCKING X11 UNFUG
+      file:
+        src: /home/getraenkekasse/.xinitrc
+        dest: /home/getraenkekasse/.xsession
+        owner: getraenkekasse
+        group: getraenkekasse
+        state: link
       notify:
         - restart getränkekiosk
     - name: create kalkspace settings dir
@@ -30,12 +39,6 @@
         state: directory
         owner: getraenkekasse-mgmt
         group: getraenkekasse-mgmt
-    - name: copy phoc.ini
-      copy:
-        src: files/phoc.ini
-        dest: /etc/kalkspace/phoc.ini
-      notify:
-        - restart getränkekiosk
     - name: copy kiosk.sh
       template:
         src: templates/kiosk.sh.j2
@@ -56,6 +59,18 @@
         path: /etc/systemd/system.conf
         regexp: "^DefaultTimeoutStopSec="
         line: DefaultTimeoutStopSec=5s
+    - name: autologin as kasse
+      ansible.builtin.lineinfile:
+        path: /etc/lightdm/lightdm.conf
+        regexp: "^autologin-user="
+        insertafter: "#autologin-user="
+        line: autologin-user=getraenkekasse
+    - name: enable lightdm
+      systemd:
+        name: lightdm
+        enabled: yes
+        daemon_reload: yes
+        state: started
 
   become: true
   become_user: root
