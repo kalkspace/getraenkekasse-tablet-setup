@@ -1,22 +1,19 @@
 #!/bin/sh
 
+squeekboard &
+
 FAIL="1"
 while [ "$FAIL" -ne "0" ]; do
     sleep 1
-    curl http://getraenkekasse.kalk.space -s -f -L -o /dev/null
+    curl http://{{ public_hostname }} -s -f -L -o /dev/null
     FAIL=$?
 done
 # wait for mete as well so the initial screen shows drinks right away
 FAIL="1"
 while [ "$FAIL" -ne "0" ]; do
     sleep 1
-    curl http://getraenkekasse.kalk.space/mete/api/v1/drinks.json -s -f -L -o /dev/null
+    curl http://{{ public_hostname }}/mete/api/v1/drinks.json -s -f -L -o /dev/null
     FAIL=$?
 done
 
-chromium \
-    --enable-features=UseOzonePlatform \
-    --ozone-platform=wayland \
-    --disable-pinch --start-fullscreen \
-    --overscroll-history-navigation=0 \
-    --kiosk http://getraenkekasse.kalk.space
+firefox --kiosk http://{{ public_hostname }}

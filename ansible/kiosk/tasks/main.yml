@@ -7,7 +7,7 @@
     - name: install tablet kiosk required packages
       apt:
         pkg:
-          - chromium
+          - firefox-esr
           - phoc
           - foot
           - curl
