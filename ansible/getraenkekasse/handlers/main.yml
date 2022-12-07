@@ -6,3 +6,7 @@
     restarted: yes
     services:
       - traefik
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+  become: true

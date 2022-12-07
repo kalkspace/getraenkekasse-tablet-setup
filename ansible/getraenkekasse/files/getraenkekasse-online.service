@@ -1,0 +1,7 @@
+[Unit]
+Description=Getränkekasse Online
+After=docker.service
+
+[Service]
+Type=notify
+ExecStart=/etc/kalkspace/getraenkekasse/getraenkekasse-online.sh

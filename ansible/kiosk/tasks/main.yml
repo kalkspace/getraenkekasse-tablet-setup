@@ -1,5 +1,8 @@
 ---
 - block:
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: getraenkekasse
     - name: apt update && upgrade
       apt:
         cache_valid_time: 3600
@@ -7,29 +10,45 @@
     - name: install tablet kiosk required packages
       apt:
         pkg:
-          - firefox-esr
+          # firefox slow af but supports virtual keyboard
+          - firefox
           - phoc
           - foot
-          - curl
-    - name: remove pulseaudio
-      apt:
-        name: pulseaudio
-        state: absent
-    - name: copy getränkekiosk
+          - lm-sensors
+          - mesa-utils
+          - xdg-utils
+          - squeekboard
+          - fonts-noto-cjk
+          - fonts-noto-cjk-extra
+          - fonts-noto-color-emoji
+          - adwaita-icon-theme-full
+          - gnome-icon-theme
+    - name: ensure getraenkekasse is in video and audio group
+      user:
+        name: getraenkekasse
+        groups:
+          - audio
+          - render
+          - video
+        append: yes
+    # read only for user
+    - name: create bash_profile
       copy:
-        src: files/getraenke-kiosk.service
-        dest: /etc/systemd/system/getraenke-kiosk.service
-        owner: getraenkekasse-mgmt
-        group: getraenkekasse-mgmt
+        src: files/bash_profile
+        dest: /home/getraenkekasse/.bash_profile
+        owner: root
+        group: root
         mode: 0755
-      notify:
-        - restart getränkekiosk
+    - name: get getraenkekasse uid
+      getent:
+        database: passwd
+        key: getraenkekasse
     - name: create kalkspace settings dir
       file:
         path: /etc/kalkspace
         state: directory
-        owner: getraenkekasse-mgmt
-        group: getraenkekasse-mgmt
+        owner: root
+        group: root
     - name: copy phoc.ini
       copy:
         src: files/phoc.ini
@@ -40,22 +59,40 @@
       template:
         src: templates/kiosk.sh.j2
         dest: /etc/kalkspace/kiosk.sh
-        owner: getraenkekasse-mgmt
-        group: getraenkekasse-mgmt
+        owner: root
+        group: root
         mode: 0755
       notify:
         - restart getränkekiosk
-    - name: enable getränkekiosk
-      systemd:
-        name: getraenke-kiosk
-        enabled: yes
-        daemon_reload: yes
-        state: started
-    - name: reduce stop timeout because containerd-shim hangs
-      ansible.builtin.lineinfile:
-        path: /etc/systemd/system.conf
-        regexp: "^DefaultTimeoutStopSec="
-        line: DefaultTimeoutStopSec=5s
+    - name: create systemd getty override dir
+      file:
+        path: /etc/systemd/system/getty@tty1.service.d/
+        state: directory
+        owner: root
+        group: root
+    - name: autologin getraenkekasse
+      copy:
+        src: files/autologin.conf
+        dest: /etc/systemd/system/getty@tty1.service.d/autologin.conf
+        owner: root
+        group: root
+        mode: 0755
+      notify:
+        - restart getränkekiosk
+    - name: enable squeekboard
+      ansible.builtin.shell: gsettings set org.gnome.desktop.a11y.applications screen-keyboard-enabled true
+      become_user: getraenkekasse
+      environment:
+        XDG_RUNTIME_DIR: "/run/user/{{ getent_passwd.getraenkekasse[1] }}"
+      notify:
+        - restart getränkekiosk
+    - name: set keyboard layout
+      ansible.builtin.shell: gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'de')]"
+      become_user: getraenkekasse
+      environment:
+        XDG_RUNTIME_DIR: "/run/user/{{ getent_passwd.getraenkekasse[1] }}"
+      notify:
+        - restart getränkekiosk
 
   become: true
   become_user: root

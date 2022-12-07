@@ -27,7 +27,7 @@ services:
     environment:
       RAILS_ENV: production
       RAILS_RELATIVE_URL_ROOT: /mete
-    image: chaosdorf/mete
+    image: quay.io/kalkspace/mete
     volumes:
       - system:/app/public/system
     restart: unless-stopped
@@ -41,7 +41,7 @@ services:
       traefik.http.routers.mete-https.middlewares: only-internal@file
       traefik.http.routers.mete-http.rule: ${TRAEFIK_HOST_RULE}PathPrefix(`/mete`)
       traefik.http.routers.mete-http.entrypoints: web
-        
+
   # mete expects name = db
   db:
     networks:

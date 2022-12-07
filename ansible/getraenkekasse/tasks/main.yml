@@ -8,38 +8,22 @@
       file:
         path: /etc/kalkspace
         state: directory
-        owner: getraenkekasse-mgmt
-        group: getraenkekasse-mgmt
+        owner: root
+        group: root
     - name: install required packages
       apt:
         pkg:
+          - curl
           - docker.io
           - docker-compose
           - python3-docker
           - pcscd
           - libacsccid1
           - prometheus-node-exporter
-    - name: blacklist kernel nfc module so pcscd works
-      copy:
-        src: files/nfc-blacklist.conf
-        dest: /etc/modprobe.d/nfc-blacklist.conf
-        owner: root
-        group: root
-    - name: blacklist kernel sound module (needs firmware, spams log)
-      copy:
-        src: files/sound-blacklist.conf
-        dest: /etc/modprobe.d/sound-blacklist.conf
-        owner: root
-        group: root
     - name: copy stornoschluessel udev rules
       copy:
         src: files/52-storno.rules
         dest: /etc/udev/rules.d/52-storno.rules
-    - name: ensure getraenkekasse-mgmt can run docker
-      user:
-        name: getraenkekasse-mgmt
-        groups: docker
-        append: yes
     - name: enable docker
       systemd:
         name: docker
@@ -52,32 +36,24 @@
         enabled: yes
         masked: no
         state: started
-    - name: disable modemmanager
-      systemd:
-        name: ModemManager
-        enabled: no
-        masked: no
-        state: stopped
     - name: getraenkekasse directory
       file:
         path: /etc/kalkspace/getraenkekasse
         state: directory
-        owner: getraenkekasse-mgmt
-        group: getraenkekasse-mgmt
+        owner: root
+        group: root
     - name: copy docker-compose definition
       copy:
         src: files/docker-compose.yml
         dest: /etc/kalkspace/getraenkekasse/docker-compose.yml
-        owner: getraenkekasse-mgmt
-        group: getraenkekasse-mgmt
-    - debug:
-        var: ansible_default_ipv6
+        owner: root
+        group: root
     - name: create traefik.toml
       ansible.builtin.template:
         src: templates/traefik.toml.j2
         dest: /etc/kalkspace/getraenkekasse/traefik.toml
-        owner: getraenkekasse-mgmt
-        group: getraenkekasse-mgmt
+        owner: root
+        group: root
         mode: 0755
       notify:
         - restart traefik
@@ -85,11 +61,24 @@
       ansible.builtin.template:
         src: templates/fileprovider.toml.j2
         dest: /etc/kalkspace/getraenkekasse/fileprovider.toml
-        owner: getraenkekasse-mgmt
-        group: getraenkekasse-mgmt
+        owner: root
+        group: root
         mode: 0755
+    - name: copy getraenkekasse-online
+      template:
+        src: templates/getraenkekasse-online.sh.j2
+        dest: /etc/kalkspace/getraenkekasse/getraenkekasse-online.sh
+        owner: root
+        group: root
+        mode: 0755
+    - name: copy getraenkekasse-online service
+      template:
+        src: files/getraenkekasse-online.service
+        dest: /etc/systemd/system/getraenkekasse-online.service
+        owner: root
+        group: root
       notify:
-        - restart traefik
+        - reload systemd
     - name: start getraenkekasse setup
       community.general.docker_compose:
         project_src: /etc/kalkspace/getraenkekasse/

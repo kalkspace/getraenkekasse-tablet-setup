@@ -1,0 +1,3 @@
+if [[ $(tty) == "/dev/tty1" ]]; then
+  exec phoc -C /etc/kalkspace/phoc.ini -E /etc/kalkspace/kiosk.sh
+fi

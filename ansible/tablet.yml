@@ -4,5 +4,5 @@
     - tablet
   roles:
     - user
-    - kiosk
     - getraenkekasse
+    - kiosk

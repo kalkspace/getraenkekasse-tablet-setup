@@ -1,0 +1,19 @@
+#!/bin/sh
+
+systemd-notify --status "Waiting for frontend to become online..."
+
+FAIL="1"
+while [ "$FAIL" -ne "0" ]; do
+    sleep 1
+    curl http://{{ public_hostname }} -s -f -L -o /dev/null
+    FAIL=$?
+done
+systemd-notify --status "Frontend is online. Waiting for mete backend..."
+# wait for mete as well so the initial screen shows drinks right away
+FAIL="1"
+while [ "$FAIL" -ne "0" ]; do
+    sleep 1
+    curl http://{{ public_hostname }}/mete/api/v1/drinks.json -s -f -L -o /dev/null
+    FAIL=$?
+done
+systemd-notify --ready --status "Frontend and mete are online!"

@@ -2,6 +2,6 @@
 - block:
     - name: restart getränkekiosk
       systemd:
-        name: getraenke-kiosk
+        name: getty@tty1
         state: restarted
   become: true
