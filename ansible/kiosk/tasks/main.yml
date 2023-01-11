@@ -3,6 +3,13 @@
     - name: Set hostname
       ansible.builtin.hostname:
         name: getraenkekasse
+    # otherwise the event bus will throw 401
+    - name: remap getraenkekasse.kalk.space to localhost so that loopback device is used
+      lineinfile:
+        path: "/etc/hosts"
+        regexp: "^127\\.0\\.1\\.1"
+        line: "127.0.1.1\tgetraenkekasse.kalk.space getraenkekasse"
+        state: present
     - name: apt update && upgrade
       apt:
         cache_valid_time: 3600
