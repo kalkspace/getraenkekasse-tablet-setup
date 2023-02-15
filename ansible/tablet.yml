@@ -3,6 +3,9 @@
   hosts:
     - tablet
   roles:
-    - user
-    - getraenkekasse
-    - kiosk
+    - name: user
+      tags: user
+    - name: getraenkekasse
+      tags: getraenkekasse
+    - name: kiosk
+      tags: kiosk

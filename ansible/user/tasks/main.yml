@@ -20,6 +20,7 @@
     - haralk
     - m0ppers
     - mraerino
+    - ansgarprause
 
 - name: allow nopasswd sudo
   lineinfile:
