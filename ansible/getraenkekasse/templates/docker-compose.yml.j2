@@ -85,6 +85,8 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_FILE: /var/lib/getraenkekasse-mete-compat/database.sqlite
+      METE_BASEURL: http://mete/mete
+      MASTODON_ACCESS_TOKEN: {{ mastodon_access_token }}
     volumes:
       - getraenkekasse-mete-compat-database:/var/lib/getraenkekasse-mete-compat
     labels:
