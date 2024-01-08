@@ -58,6 +58,9 @@
         state: directory
         owner: root
         group: root
+    # this would be the correct location to scale the display up.
+    # however the on screen keyboard actually scales DOWN (making it even smaller)
+    # so this is as of now not a good idea. instead we manually scale firefox
     - name: copy phoc.ini
       copy:
         src: files/phoc.ini
