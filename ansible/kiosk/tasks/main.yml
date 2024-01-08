@@ -30,6 +30,8 @@
           - fonts-noto-color-emoji
           - adwaita-icon-theme-full
           - gnome-icon-theme
+          # gsettings
+          - libglib2.0-bin
     - name: ensure getraenkekasse is in video and audio group
       user:
         name: getraenkekasse
