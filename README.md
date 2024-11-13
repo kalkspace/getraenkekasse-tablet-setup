@@ -14,7 +14,7 @@ The vault needs a password to decrypt secrets. Members of the admin team can fin
 Adjust the IP in `inventory.ini`. Be sure to check public_hostname.
 For local development use "localhost". Otherwise "getraenkekasse.kalk.space".
 
-`ansible-playbook tablet.yml -v -i inventory.ini --ask-pass -K --vault-password-file ~/.kalkspace_ansible_vault_pass`
+`ansible-playbook tablet.yml -v --ask-pass -K`
 
 ## Post work
 
@@ -26,6 +26,6 @@ Finally once the kiosk is running, attach a keyboard, hit ctrl-+ a few times so 
 
 After deploying for the first time the following command will update everything
 
-`ansible-playbook tablet.yml -i inventory.ini --vault-password-file ~/.kalkspace_ansible_vault_pass`
+`ansible-playbook tablet.yml`
 
 The browser is currently unfortunately caching the old version. If you updated the frontend please connect a keyboard and press ctrl+r so the browser fetches the new version
